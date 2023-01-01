@@ -74,7 +74,11 @@ sub.on('event', async (event: any) => {
           if (assetId.startsWith('nft')) {
             try {
               const nftResponse = await $fetch<any>(`https://api.mintgarden.io/nfts/${assetId}`);
-              nft = { name: nftResponse.data?.metadata_json?.name, thumbnail_uri: nftResponse.data?.thumbnail_uri };
+              nft = {
+                id: nftResponse.encoded_id,
+                name: nftResponse.data?.metadata_json?.name,
+                thumbnail_uri: nftResponse.data?.thumbnail_uri,
+              };
             } catch (e) {
               return;
             }
@@ -103,7 +107,11 @@ sub.on('event', async (event: any) => {
         if (assetId.startsWith('nft')) {
           try {
             const nftResponse = await $fetch<any>(`https://api.mintgarden.io/nfts/${assetId}`);
-            nft = { name: nftResponse.data?.metadata_json?.name, thumbnail_uri: nftResponse.data?.thumbnail_uri };
+            nft = {
+              id: nftResponse.encoded_id,
+              name: nftResponse.data?.metadata_json?.name,
+              thumbnail_uri: nftResponse.data?.thumbnail_uri,
+            };
           } catch (e) {
             return;
           }
@@ -245,10 +253,14 @@ const showInvalidOffers = ref(false);
               <div class="px-4 py-5 sm:p-6 grid grid-cols-2 gap-2">
                 <div>
                   <div v-for="requestedPayment in event.requestedPayments">
-                    <div v-if="requestedPayment.nft">
+                    <NuxtLink
+                      target="_blank"
+                      :to="`https://mintgarden.io/nfts/${reequestedPayment.nft.id}`"
+                      v-if="requestedPayment.nft"
+                    >
                       <img :src="requestedPayment.nft.thumbnail_uri" />
                       {{ requestedPayment.nft.name }}
-                    </div>
+                    </NuxtLink>
                     <div v-else-if="requestedPayment.cat">
                       {{ util.formatToken(requestedPayment.amount) }} {{ requestedPayment.cat.symbol }}
                     </div>
@@ -257,10 +269,14 @@ const showInvalidOffers = ref(false);
                 </div>
                 <div>
                   <div v-for="offeredCoin in event.offeredCoins">
-                    <div v-if="offeredCoin.nft">
+                    <NuxtLink
+                      target="_blank"
+                      :to="`https://mintgarden.io/nfts/${offeredCoin.nft.id}`"
+                      v-if="offeredCoin.nft"
+                    >
                       <img :src="offeredCoin.nft.thumbnail_uri" />
                       {{ offeredCoin.nft.name }}
-                    </div>
+                    </NuxtLink>
                     <div v-else-if="offeredCoin.cat">
                       {{ util.formatToken(offeredCoin.amount) }} {{ offeredCoin.cat.symbol }}
                     </div>
