@@ -122,9 +122,10 @@ sub.on('event', async (event: any) => {
     console.error(e);
   }
 });
-sub.on('eose', () => {
-  sub.unsub();
-});
+// sub.on('eose', () => {
+//   console.log('eose');
+//   sub.unsub();
+// });
 
 const sortedEvents = computed(() =>
   events.value
@@ -146,7 +147,7 @@ const postOffer = async () => {
       content: newOfferString.value,
     };
     offerEvent.id = getEventHash(offerEvent);
-    offerEvent.sig = await signEvent(offerEvent, sk);
+    offerEvent.sig = signEvent(offerEvent, sk);
 
     let pub = relay.publish(offerEvent);
     pub.on('ok', () => {
