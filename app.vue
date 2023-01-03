@@ -157,6 +157,9 @@ let pk = getPublicKey(sk);
 const newOfferString = ref('');
 const postOffer = async () => {
   try {
+    // Try to parse offer
+    Offer.from_bech32(newOfferString.value);
+
     let offerEvent: any = {
       kind: NOSTR_OFFER_TYPE,
       pubkey: pk,
