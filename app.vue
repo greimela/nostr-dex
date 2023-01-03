@@ -95,7 +95,7 @@ sub.on('event', async (event: any) => {
             status = 'spent';
           }
 
-          // TODO check the input coins for existence
+          // TODO check the input coins for existence to filter out testnet/fake offers
 
           offeredCoins.push({ amount: offeredCoin.amount, nft, cat });
         }
@@ -137,7 +137,7 @@ sub.on('event', async (event: any) => {
 
 const sortedEvents = computed(() =>
   events.value
-    .filter((event) => (showInvalidOffers.value ? true : event.status === 'active'))
+    .filter((event) => (onlyShowActiveOffers.value ? event.status === 'active' : true))
     .sort((a, b) => b.created_at - a.created_at)
 );
 
@@ -173,7 +173,7 @@ const postOffer = async () => {
   }
 };
 
-const showInvalidOffers = ref(false);
+const onlyShowActiveOffers = ref(true);
 </script>
 <template>
   <div>
@@ -228,22 +228,22 @@ const showInvalidOffers = ref(false);
         <div class="mt-8 flex justify-center">
           <SwitchGroup as="div" class="flex items-center">
             <Switch
-              v-model="showInvalidOffers"
+              v-model="onlyShowActiveOffers"
               :class="[
-                showInvalidOffers ? 'bg-emerald-600' : 'bg-gray-200',
+                onlyShowActiveOffers ? 'bg-emerald-600' : 'bg-gray-200',
                 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
               ]"
             >
               <span
                 aria-hidden="true"
                 :class="[
-                  showInvalidOffers ? 'translate-x-5' : 'translate-x-0',
+                  onlyShowActiveOffers ? 'translate-x-5' : 'translate-x-0',
                   'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
                 ]"
               />
             </Switch>
             <SwitchLabel as="span" class="ml-3">
-              <span class="text-sm font-medium text-gray-900">Show invalid offers</span>
+              <span class="text-sm font-medium text-gray-900">Only show active offers</span>
             </SwitchLabel>
           </SwitchGroup>
         </div>
