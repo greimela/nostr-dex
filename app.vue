@@ -180,6 +180,7 @@ const onlyShowActiveOffers = ref(true);
     <div class="bg-slate-50 px-4 pt-16 pb-20 sm:px-6">
       <div class="relative mx-auto max-w-lg">
         <h1 class="text-6xl font-medium text-center">nostr-dex</h1>
+        <p class='mt-4 text-center text-gray-400'>An experimental trustless decentralized exchange using the nostr protocol and Chia offers.</p>
         <form action="#" @submit.prevent="postOffer" class="mt-16 relative bg-white">
           <div
             class="overflow-hidden rounded-lg border border-gray-300 shadow-sm focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500"
