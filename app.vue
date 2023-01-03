@@ -22,7 +22,6 @@ relay.on('error' as any, () => {
 relay.on('disconnect' as any, () => {
   console.log(`disconnect from ${relay.url}`);
   relay.connect();
-
 });
 relay.on('notice' as any, () => {
   console.log(`notice  from ${relay.url}`);
@@ -59,7 +58,7 @@ let sub = relay.sub(
   [
     {
       kinds: [NOSTR_OFFER_TYPE],
-      limit: 10
+      limit: 10,
       // '#a': ['6d95dae356e32a71db5ddcb42224754a02524c615c5fc35f568c2af04774e589'],
       // '#a': ['6d95dae356e32a71db5ddcb42224754a02524c615c5fc35f568c2af04774e589'],
       // '#c': ['col1z0ef7w5n4vq9qkue67y8jnwumd9799sm50t8fyle73c70ly4z0ws0p2rhl'],
@@ -96,7 +95,7 @@ sub.on('event', async (event: any) => {
           } else if (assetId) {
             //CAT
             const existingCat = cats.find((cat) => cat.id === assetId);
-            cat = { tailHash: assetId, symbol: existingCat?.code || 'UNKNOWN' };
+            cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0,6)})` };
           }
 
           const coinResult = await $fetch<any>(
@@ -129,7 +128,7 @@ sub.on('event', async (event: any) => {
         } else if (assetId) {
           //CAT
           const existingCat = cats.find((cat) => cat.id === assetId);
-          cat = { tailHash: assetId, symbol: existingCat?.code || 'UNKNOWN' };
+          cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0,6)})` };
         }
         const amount = assetRequestedPayments.reduce((acc, val) => acc.add(val.amount), BigNumber.from(0));
         requestedPayments.push({ assetId, cat, nft, amount });
@@ -264,36 +263,43 @@ const onlyShowActiveOffers = ref(true);
         <div class="mt-8 grid gap-8">
           <div v-for="event in sortedEvents" :key="event.id">
             <div class="overflow-hidden rounded-lg bg-white shadow">
-              <div class="grid grid-cols-2 divide-x border-b  font-semibold text-gray-700 text-center">
-                <div class='p-6'>
+              <div class="grid grid-cols-2 divide-x border-b font-semibold text-gray-700 text-center">
+                <div class="p-6">
                   <div v-for="requestedPayment in event.requestedPayments">
                     <NuxtLink
                       target="_blank"
                       :to="`https://mintgarden.io/nfts/${requestedPayment.nft.id}`"
                       v-if="requestedPayment.nft"
                     >
-                      <img class='h-48 w-48 object-cover' :src="requestedPayment.nft.thumbnail_uri" />
+                      <img class="h-48 w-48 object-cover" :src="requestedPayment.nft.thumbnail_uri" />
                       {{ requestedPayment.nft.name }}
                     </NuxtLink>
-                    <div v-else-if="requestedPayment.cat">
+                    <NuxtLink
+                      target="_blank"
+                      :to="`https://www.taildatabase.com/tail/${requestedPayment.cat.tailHash}`"
+                      v-else-if="requestedPayment.cat"
+                    >
                       {{ util.formatToken(requestedPayment.amount) }} {{ requestedPayment.cat.symbol }}
-                    </div>
+                    </NuxtLink>
                     <div v-else>{{ util.formatChia(requestedPayment.amount) }} XCH</div>
                   </div>
                 </div>
-                <div class='p-6'>
+                <div class="p-6">
                   <div v-for="offeredCoin in event.offeredCoins">
                     <NuxtLink
                       target="_blank"
                       :to="`https://mintgarden.io/nfts/${offeredCoin.nft.id}`"
                       v-if="offeredCoin.nft"
                     >
-                      <img class='max-h-48 w-full object-contain mx-auto' :src="offeredCoin.nft.thumbnail_uri" />
+                      <img class="max-h-48 w-full object-contain mx-auto" :src="offeredCoin.nft.thumbnail_uri" />
                       {{ offeredCoin.nft.name }}
                     </NuxtLink>
-                    <div v-else-if="offeredCoin.cat">
+                    <NuxtLink
+                      target="_blank"
+                      :to="`https://www.taildatabase.com/tail/${offeredCoin.cat.tailHash}`"
+                      v-else-if="offeredCoin.cat">
                       {{ util.formatToken(offeredCoin.amount) }} {{ offeredCoin.cat.symbol }}
-                    </div>
+                    </NuxtLink>
                     <div v-else>{{ util.formatChia(offeredCoin.amount) }} XCH</div>
                   </div>
                 </div>
