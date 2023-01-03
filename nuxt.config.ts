@@ -7,11 +7,12 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   app: {
     head: {
-      title: 'nostr-dex',
+      title: 'nostr-dex | Trustless Chia DEX on Nostr',
       meta: [
         {
           name: 'description',
-          content: 'An experimental trustless decentralized exchange using the nostr protocol and Chia offers.',
+          content:
+            'nostr-dex is an experimental trustless decentralized exchange using the nostr protocol and Chia offers.',
         },
       ],
     },
