@@ -79,6 +79,7 @@ sub.on('event', async (event: any) => {
       // console.log(event.content);
       const offer: Offer = Offer.from_bech32(event.content);
       let status = 'active';
+      let containsNft = false;
 
       const offeredCoins: any[] = [];
       for (const [assetId, offeredCoinsForAsset] of Object.entries(offer.getOfferedCoins())) {
@@ -94,13 +95,14 @@ sub.on('event', async (event: any) => {
                 name: nftResponse.data?.metadata_json?.name,
                 thumbnail_uri: nftResponse.data?.thumbnail_uri,
               };
+              containsNft = true;
             } catch (e) {
               return;
             }
           } else if (assetId) {
             //CAT
             const existingCat = cats.find((cat) => cat.id === assetId);
-            cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0, 6)})` };
+            cat = { tailHash: assetId, symbol: existingCat?.code || 'UNKNOWN' };
           }
 
           const coinResult = await $fetch<any>(
@@ -127,19 +129,20 @@ sub.on('event', async (event: any) => {
               name: nftResponse.data?.metadata_json?.name,
               thumbnail_uri: nftResponse.data?.thumbnail_uri,
             };
+            containsNft = true;
           } catch (e) {
             return;
           }
         } else if (assetId) {
           //CAT
           const existingCat = cats.find((cat) => cat.id === assetId);
-          cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0, 6)})` };
+          cat = { tailHash: assetId, symbol: existingCat?.code || 'UNKNOWN' };
         }
         const amount = assetRequestedPayments.reduce((acc, val) => acc.add(val.amount), BigNumber.from(0));
         requestedPayments.push({ assetId, cat, nft, amount });
       }
 
-      events.value.push({ ...event, offeredCoins, requestedPayments, status });
+      events.value.push({ ...event, offeredCoins, requestedPayments, status, containsNft });
     }
   } catch (e) {
     console.error(e);
@@ -149,12 +152,6 @@ sub.on('event', async (event: any) => {
 //   console.log('eose');
 //   sub.unsub();
 // });
-
-const sortedEvents = computed(() =>
-  events.value
-    .filter((event) => (onlyShowActiveOffers.value ? event.status === 'active' : true))
-    .sort((a, b) => b.created_at - a.created_at)
-);
 
 let sk = generatePrivateKey();
 let pk = getPublicKey(sk);
@@ -191,7 +188,25 @@ const postOffer = async () => {
   }
 };
 
-const onlyShowActiveOffers = ref(true);
+const route = useRoute();
+const router = useRouter();
+const onlyShowActiveOffers = ref(route.query.active ? route.query.active === 'true' : true);
+const showNftOffers = ref(route.query.nft ? route.query.nft === 'true' : true);
+watch([onlyShowActiveOffers, showNftOffers], ([active, nft]) => {
+  router.replace({
+    path: route.path,
+    query: { active: String(active), nft: String(nft) },
+  });
+});
+
+const sortedEvents = computed(() =>
+  events.value
+    .filter((event) => (onlyShowActiveOffers.value ? event.status === 'active' : true))
+    .filter((event) => {
+      return showNftOffers.value ? true : !event.containsNft;
+    })
+    .sort((a, b) => b.created_at - a.created_at)
+);
 </script>
 <template>
   <div>
@@ -259,26 +274,48 @@ const onlyShowActiveOffers = ref(true);
         </form>
 
         <div class="mt-8 flex justify-center">
-          <SwitchGroup as="div" class="flex items-center">
-            <Switch
-              v-model="onlyShowActiveOffers"
-              :class="[
-                onlyShowActiveOffers ? 'bg-emerald-600' : 'bg-gray-200',
-                'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
-              ]"
-            >
-              <span
-                aria-hidden="true"
+          <div class="inline-flex flex-col gap-3">
+            <SwitchGroup as="div" class="flex items-center">
+              <Switch
+                v-model="onlyShowActiveOffers"
                 :class="[
-                  onlyShowActiveOffers ? 'translate-x-5' : 'translate-x-0',
-                  'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  onlyShowActiveOffers ? 'bg-emerald-600' : 'bg-gray-200',
+                  'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
                 ]"
-              />
-            </Switch>
-            <SwitchLabel as="span" class="ml-3">
-              <span class="text-sm font-medium text-gray-900">Only show active offers</span>
-            </SwitchLabel>
-          </SwitchGroup>
+              >
+                <span
+                  aria-hidden="true"
+                  :class="[
+                    onlyShowActiveOffers ? 'translate-x-5' : 'translate-x-0',
+                    'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  ]"
+                />
+              </Switch>
+              <SwitchLabel as="span" class="ml-3">
+                <span class="text-sm font-medium text-gray-900">Only show active offers</span>
+              </SwitchLabel>
+            </SwitchGroup>
+            <SwitchGroup as="div" class="flex items-center">
+              <Switch
+                v-model="showNftOffers"
+                :class="[
+                  showNftOffers ? 'bg-emerald-600' : 'bg-gray-200',
+                  'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2',
+                ]"
+              >
+                <span
+                  aria-hidden="true"
+                  :class="[
+                    showNftOffers ? 'translate-x-5' : 'translate-x-0',
+                    'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                  ]"
+                />
+              </Switch>
+              <SwitchLabel as="span" class="ml-3">
+                <span class="text-sm font-medium text-gray-900">Show NFT offers</span>
+              </SwitchLabel>
+            </SwitchGroup>
+          </div>
         </div>
         <div class="mt-8 grid gap-8">
           <div v-for="event in sortedEvents" :key="event.id">
