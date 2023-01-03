@@ -246,16 +246,7 @@ const onlyShowActiveOffers = ref(true);
           </div>
 
           <div class="absolute inset-x-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-            <div class="flex items-center space-x-5">
-              <!--            <div class="flex items-center">-->
-              <!--              <button type="button" class="-m-2.5 flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500">-->
-              <!--                <PaperClipIcon class="h-5 w-5" aria-hidden="true" />-->
-              <!--                <span class="sr-only">Attach a file</span>-->
-              <!--              </button>-->
-              <!--            </div>-->
-              <!--            <div class="flex items-center">-->
-              <!--            </div>-->
-            </div>
+            <div class="flex items-center space-x-5"></div>
             <div class="flex-shrink-0">
               <button
                 type="submit"
@@ -295,42 +286,30 @@ const onlyShowActiveOffers = ref(true);
               <div class="grid grid-cols-2 divide-x border-b font-semibold text-gray-700 text-center">
                 <div class="p-6">
                   <div v-for="requestedPayment in event.requestedPayments">
-                    <NuxtLink
-                      target="_blank"
-                      :to="`https://mintgarden.io/nfts/${requestedPayment.nft.id}`"
-                      v-if="requestedPayment.nft"
-                    >
-                      <img class="h-48 w-48 object-cover" :src="requestedPayment.nft.thumbnail_uri" />
-                      {{ requestedPayment.nft.name }}
-                    </NuxtLink>
-                    <NuxtLink
-                      target="_blank"
-                      :to="`https://www.taildatabase.com/tail/${requestedPayment.cat.tailHash}`"
+                    <Nft v-if="requestedPayment.nft" :nft="requestedPayment.nft" />
+                    <Cat
                       v-else-if="requestedPayment.cat"
-                    >
-                      {{ util.formatToken(requestedPayment.amount) }} {{ requestedPayment.cat.symbol }}
-                    </NuxtLink>
-                    <div v-else>{{ util.formatChia(requestedPayment.amount) }} XCH</div>
+                      :amount="requestedPayment.amount"
+                      :cat="requestedPayment.cat"
+                    />
+                    <div v-else class="inline-flex gap-1">
+                      <img class="h-6 w-6" src="https://icons.dexie.space/xch.webp" />{{
+                        util.formatChia(requestedPayment.amount)
+                      }}
+                      XCH
+                    </div>
                   </div>
                 </div>
                 <div class="p-6">
                   <div v-for="offeredCoin in event.offeredCoins">
-                    <NuxtLink
-                      target="_blank"
-                      :to="`https://mintgarden.io/nfts/${offeredCoin.nft.id}`"
-                      v-if="offeredCoin.nft"
-                    >
-                      <img class="max-h-48 w-full object-contain mx-auto" :src="offeredCoin.nft.thumbnail_uri" />
-                      {{ offeredCoin.nft.name }}
-                    </NuxtLink>
-                    <NuxtLink
-                      target="_blank"
-                      :to="`https://www.taildatabase.com/tail/${offeredCoin.cat.tailHash}`"
-                      v-else-if="offeredCoin.cat"
-                    >
-                      {{ util.formatToken(offeredCoin.amount) }} {{ offeredCoin.cat.symbol }}
-                    </NuxtLink>
-                    <div v-else>{{ util.formatChia(offeredCoin.amount) }} XCH</div>
+                    <Nft v-if="offeredCoin.nft" :nft="offeredCoin.nft" />
+                    <Cat v-else-if="offeredCoin.cat" :amount="offeredCoin.amount" :cat="offeredCoin.cat" />
+                    <div v-else class="inline-flex gap-1">
+                      <img class="h-6 w-6" src="https://icons.dexie.space/xch.webp" />{{
+                        util.formatChia(offeredCoin.amount)
+                      }}
+                      XCH
+                    </div>
                   </div>
                 </div>
               </div>
