@@ -19,7 +19,14 @@ relay.on('connect', () => {
 relay.on('error' as any, () => {
   console.log(`failed to connect to ${relay.url}`);
 });
+relay.on('disconnect' as any, () => {
+  console.log(`disconnect from ${relay.url}`);
+  relay.connect();
 
+});
+relay.on('notice' as any, () => {
+  console.log(`notice  from ${relay.url}`);
+});
 const cats = [
   {
     id: 'a628c1c2c6fcb74d53746157e438e108eab5c0bb3e5c80ff9b1910b3e4832913',
@@ -52,6 +59,10 @@ let sub = relay.sub(
   [
     {
       kinds: [NOSTR_OFFER_TYPE],
+      limit: 10
+      // '#a': ['6d95dae356e32a71db5ddcb42224754a02524c615c5fc35f568c2af04774e589'],
+      // '#a': ['6d95dae356e32a71db5ddcb42224754a02524c615c5fc35f568c2af04774e589'],
+      // '#c': ['col1z0ef7w5n4vq9qkue67y8jnwumd9799sm50t8fyle73c70ly4z0ws0p2rhl'],
       // authors: ['214fa97d9d406ba5e447035c312c2ee5ecf4fde91cde359917472ea9193d76b7']
     },
   ],
@@ -180,7 +191,9 @@ const onlyShowActiveOffers = ref(true);
     <div class="bg-slate-50 px-4 pt-16 pb-20 sm:px-6">
       <div class="relative mx-auto max-w-lg">
         <h1 class="text-6xl font-medium text-center">nostr-dex</h1>
-        <p class='mt-4 text-center text-gray-400'>An experimental trustless decentralized exchange using the nostr protocol and Chia offers.</p>
+        <p class="mt-4 text-center text-gray-400">
+          An experimental trustless decentralized exchange using the nostr protocol and Chia offers.
+        </p>
         <form action="#" @submit.prevent="postOffer" class="mt-16 relative bg-white">
           <div
             class="overflow-hidden rounded-lg border border-gray-300 shadow-sm focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500"
