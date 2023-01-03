@@ -1,5 +1,6 @@
 <script setup>
 import { ArrowDownTrayIcon } from '@heroicons/vue/24/solid';
+import { ClipboardDocumentIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 import { useGoby } from '~/composables/useGoby';
 
 const { goby, takeOffer: takeOfferInGoby } = useGoby();
@@ -32,6 +33,13 @@ const takeOffer = () => {
     downloadOffer(offer);
   }
 };
+
+const copied = ref(false);
+const copyOffer = () => {
+  navigator.clipboard.writeText(offer.offer);
+  copied.value = true;
+  setTimeout(() => (copied.value = false), 1000);
+};
 </script>
 <template>
   <span class="relative inline-flex rounded-md shadow-sm">
@@ -51,10 +59,19 @@ const takeOffer = () => {
       type="button"
       v-if="goby.isGobyInstalled"
       @click="downloadOffer"
-      class="relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+      class="relative -ml-px inline-flex items-center border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
     >
       <span class="sr-only">Download Offer</span>
       <ArrowDownTrayIcon class="h-4 w-4" aria-hidden="true" />
+    </button>
+    <button
+      type="button"
+      @click="copyOffer"
+      class="relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+    >
+      <span class="sr-only">Copy Offer</span>
+      <CheckCircleIcon v-if='copied' class="h-4 w-4" aria-hidden="true" />
+      <ClipboardDocumentIcon v-else class="h-4 w-4" aria-hidden="true" />
     </button>
   </span>
 </template>
