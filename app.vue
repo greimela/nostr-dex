@@ -264,15 +264,15 @@ const onlyShowActiveOffers = ref(true);
         <div class="mt-8 grid gap-8">
           <div v-for="event in sortedEvents" :key="event.id">
             <div class="overflow-hidden rounded-lg bg-white shadow">
-              <div class="px-4 py-5 sm:p-6 grid grid-cols-2 gap-2">
-                <div>
+              <div class="grid grid-cols-2 divide-x border-b  font-semibold text-gray-700 text-center">
+                <div class='p-6'>
                   <div v-for="requestedPayment in event.requestedPayments">
                     <NuxtLink
                       target="_blank"
                       :to="`https://mintgarden.io/nfts/${requestedPayment.nft.id}`"
                       v-if="requestedPayment.nft"
                     >
-                      <img :src="requestedPayment.nft.thumbnail_uri" />
+                      <img class='h-48 w-48 object-cover' :src="requestedPayment.nft.thumbnail_uri" />
                       {{ requestedPayment.nft.name }}
                     </NuxtLink>
                     <div v-else-if="requestedPayment.cat">
@@ -281,14 +281,14 @@ const onlyShowActiveOffers = ref(true);
                     <div v-else>{{ util.formatChia(requestedPayment.amount) }} XCH</div>
                   </div>
                 </div>
-                <div>
+                <div class='p-6'>
                   <div v-for="offeredCoin in event.offeredCoins">
                     <NuxtLink
                       target="_blank"
                       :to="`https://mintgarden.io/nfts/${offeredCoin.nft.id}`"
                       v-if="offeredCoin.nft"
                     >
-                      <img :src="offeredCoin.nft.thumbnail_uri" />
+                      <img class='max-h-48 w-full object-contain mx-auto' :src="offeredCoin.nft.thumbnail_uri" />
                       {{ offeredCoin.nft.name }}
                     </NuxtLink>
                     <div v-else-if="offeredCoin.cat">
@@ -298,7 +298,7 @@ const onlyShowActiveOffers = ref(true);
                   </div>
                 </div>
               </div>
-              <div class="p-4" v-if="event.status === 'active'">
+              <div class="p-4 flex justify-center" v-if="event.status === 'active'">
                 <TakeOfferButton :offer="{ offer: event.content }" />
               </div>
             </div>
