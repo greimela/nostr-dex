@@ -13,13 +13,18 @@ const NOSTR_OFFER_TYPE = 8444;
 const relay = relayInit('wss://nostr.8e23.net');
 await relay.connect();
 
+const isConnected = ref(false);
+
 relay.on('connect', () => {
   console.log(`connected to ${relay.url}`);
+  isConnected.value = true;
 });
 relay.on('error' as any, () => {
   console.log(`failed to connect to ${relay.url}`);
+  isConnected.value = false;
 });
 relay.on('disconnect' as any, () => {
+  isConnected.value = false;
   console.log(`disconnect from ${relay.url}`);
   relay.connect();
 });
@@ -95,7 +100,7 @@ sub.on('event', async (event: any) => {
           } else if (assetId) {
             //CAT
             const existingCat = cats.find((cat) => cat.id === assetId);
-            cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0,6)})` };
+            cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0, 6)})` };
           }
 
           const coinResult = await $fetch<any>(
@@ -128,7 +133,7 @@ sub.on('event', async (event: any) => {
         } else if (assetId) {
           //CAT
           const existingCat = cats.find((cat) => cat.id === assetId);
-          cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0,6)})` };
+          cat = { tailHash: assetId, symbol: existingCat?.code || `UNKNOWN (${assetId.substring(0, 6)})` };
         }
         const amount = assetRequestedPayments.reduce((acc, val) => acc.add(val.amount), BigNumber.from(0));
         requestedPayments.push({ assetId, cat, nft, amount });
@@ -196,7 +201,28 @@ const onlyShowActiveOffers = ref(true);
         <p class="mt-4 text-center text-gray-400">
           An experimental trustless decentralized exchange using the nostr protocol and Chia offers.
         </p>
-        <form action="#" @submit.prevent="postOffer" class="mt-16 relative bg-white">
+        <div class="mt-4 flex justify-center">
+          <div v-if="isConnected" class="flex items-center gap-2 text-sm text-gray-700 font-semibold text-emerald-600">
+            <div class="relative inline-flex">
+              <span class="flex h-3 w-3">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                ></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
+              </span>
+            </div>
+            Socket connected
+          </div>
+          <div v-else class="flex items-center gap-2 text-sm text-gray-700 font-semibold text-gray-600">
+            <div class="relative inline-flex">
+              <span class="flex h-3 w-3">
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-gray-600"></span>
+              </span>
+            </div>
+            Socket disconnected
+          </div>
+        </div>
+        <form action="#" @submit.prevent="postOffer" class="mt-4 relative bg-white">
           <div
             class="overflow-hidden rounded-lg border border-gray-300 shadow-sm focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500"
           >
@@ -300,7 +326,8 @@ const onlyShowActiveOffers = ref(true);
                     <NuxtLink
                       target="_blank"
                       :to="`https://www.taildatabase.com/tail/${offeredCoin.cat.tailHash}`"
-                      v-else-if="offeredCoin.cat">
+                      v-else-if="offeredCoin.cat"
+                    >
                       {{ util.formatToken(offeredCoin.amount) }} {{ offeredCoin.cat.symbol }}
                     </NuxtLink>
                     <div v-else>{{ util.formatChia(offeredCoin.amount) }} XCH</div>
