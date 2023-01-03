@@ -255,7 +255,7 @@ const onlyShowActiveOffers = ref(true);
                   <div v-for="requestedPayment in event.requestedPayments">
                     <NuxtLink
                       target="_blank"
-                      :to="`https://mintgarden.io/nfts/${reequestedPayment.nft.id}`"
+                      :to="`https://mintgarden.io/nfts/${requestedPayment.nft.id}`"
                       v-if="requestedPayment.nft"
                     >
                       <img :src="requestedPayment.nft.thumbnail_uri" />
