@@ -28,7 +28,7 @@ const postOffer = async () => {
     offerEvent.sig = signEvent(offerEvent, sk);
 
     await publish(offerEvent);
-    newOfferString.value = ''
+    newOfferString.value = '';
   } catch (e) {
     alert(e);
   }
@@ -63,7 +63,12 @@ const tabs = [
       <div class="relative mx-auto max-w-lg">
         <h1 class="text-6xl font-medium text-center">nostr-dex</h1>
         <p class="mt-4 text-center text-gray-400">
-          An experimental trustless decentralized exchange using the nostr protocol and Chia offers.
+          An experimental trustless decentralized exchange using the
+          <a href="https://github.com/nostr-protocol/nostr" target="_blank" class="font-semibold text-gray-500"
+            >nostr protocol</a
+          >
+          and
+          <a href="https://chialisp.com/offers/" target="_blank" class="font-semibold text-gray-500">Chia offers</a>.
         </p>
         <div class="mt-4 flex justify-center">
           <div v-if="isConnected" class="flex items-center gap-2 text-sm text-gray-700 font-semibold text-emerald-600">
