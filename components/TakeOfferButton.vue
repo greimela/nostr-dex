@@ -47,8 +47,7 @@ const copyOffer = () => {
       type="button"
       @click="takeOffer"
       :class="[
-        goby.isGobyInstalled ? 'rounded-l-md' : 'rounded-md',
-        'relative inline-flex border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500',
+        'rounded-l-md relative inline-flex border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500',
       ]"
     >
       <img v-if="goby.isGobyInstalled" class="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" src="/goby-logo.svg" />
@@ -70,7 +69,7 @@ const copyOffer = () => {
       class="relative -ml-px inline-flex items-center rounded-r-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 hover:bg-gray-50 focus:z-10 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
     >
       <span class="sr-only">Copy Offer</span>
-      <CheckCircleIcon v-if='copied' class="h-4 w-4" aria-hidden="true" />
+      <CheckCircleIcon v-if="copied" class="h-4 w-4" aria-hidden="true" />
       <ClipboardDocumentIcon v-else class="h-4 w-4" aria-hidden="true" />
     </button>
   </span>
