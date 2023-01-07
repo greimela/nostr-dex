@@ -9,13 +9,11 @@ import {
   SETTLEMENT_PAYMENTS_MOD_HASH,
   SETTLEMENT_PAYMENTS_OLD_MOD_HASH,
 } from '~/chia/puzzle-compression';
-import { Bytes, int_from_bytes, SExp } from 'clvm';
+import { bigint_from_bytes, Bytes, int_from_bytes, SExp } from 'clvm';
 import { Coin, CoinSpend, util } from 'greenwebjs';
 import { ConditionsDict } from 'greenwebjs/util/sexp';
 import { ConditionOpcode } from 'greenwebjs/util/sexp/condition_opcodes';
 import { BigNumberish } from '@ethersproject/bignumber';
-import { BytesLike } from '@ethersproject/bytes';
-import { disassemble } from 'clvm_tools/clvm_tools/binutils';
 
 const ZERO_32 = '0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -234,6 +232,6 @@ export class NotarizedPayment {
     if (jsCondition.length > 2) {
       memos = jsCondition[3];
     }
-    return new NotarizedPayment(puzzle_hash, int_from_bytes(Bytes.from(amount, 'hex')), memos, nonce);
+    return new NotarizedPayment(puzzle_hash, bigint_from_bytes(Bytes.from(amount, 'hex')), memos, nonce);
   }
 }
