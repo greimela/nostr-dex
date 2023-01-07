@@ -49,7 +49,28 @@ export const useRelay = async () => {
     return sub;
   }
 
-  return { isConnected, subscribeToEvents };
+  function publish(event: Event) {
+    return new Promise<void>((resolve, reject) => {
+      if (!relay.value) {
+        reject('Relay not initialized');
+        return;
+      }
+      let pub = relay.value.publish(event);
+      pub.on('ok', () => {
+        console.log(`${relay.value!.url} has accepted our event`);
+      });
+      pub.on('seen', () => {
+        console.log(`we saw the event on ${relay.value!.url}`);
+        resolve();
+      });
+      pub.on('failed', (reason: any) => {
+        console.log(`failed to publish to ${relay.value!.url}: ${reason}`);
+        reject(reason);
+      });
+    });
+  }
+
+  return { isConnected, subscribeToEvents, publish };
 };
 
 async function parseOfferEvent(event: Event) {

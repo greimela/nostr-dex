@@ -6,7 +6,7 @@ import { Offer } from '~/chia/offer';
 
 window.Buffer = Buffer;
 
-const { isConnected } = await useRelay();
+const { isConnected, publish } = await useRelay();
 
 let sk = generatePrivateKey();
 let pk = getPublicKey(sk);
@@ -27,25 +27,39 @@ const postOffer = async () => {
     offerEvent.id = getEventHash(offerEvent);
     offerEvent.sig = signEvent(offerEvent, sk);
 
-    let pub = relay.publish(offerEvent);
-    pub.on('ok', () => {
-      console.log(`${relay.url} has accepted our event`);
-      newOfferString.value = '';
-    });
-    pub.on('seen', () => {
-      console.log(`we saw the event on ${relay.url}`);
-    });
-    pub.on('failed', (reason: any) => {
-      console.log(`failed to publish to ${relay.url}: ${reason}`);
-    });
+    await publish(offerEvent);
+    newOfferString.value = ''
   } catch (e) {
     alert(e);
   }
 };
+
+const tabs = [
+  {
+    to: '/',
+    name: 'All Markets',
+  },
+  {
+    to: '/type/cat',
+    name: 'All CATs',
+  },
+  {
+    to: '/type/nft',
+    name: 'All NFTs',
+  },
+  {
+    to: '/asset/6d95dae356e32a71db5ddcb42224754a02524c615c5fc35f568c2af04774e589',
+    name: 'USDS',
+  },
+  {
+    to: '/asset/db1a9020d48d9d4ad22631b66ab4b9ebd3637ef7758ad38881348c5d24c38f20',
+    name: 'DBX',
+  },
+];
 </script>
 <template>
   <div>
-    <div class="bg-slate-50 px-4 pt-16 pb-20 sm:px-6">
+    <div class="min-h-screen bg-slate-50 px-4 pt-16 pb-20 sm:px-6">
       <div class="relative mx-auto max-w-lg">
         <h1 class="text-6xl font-medium text-center">nostr-dex</h1>
         <p class="mt-4 text-center text-gray-400">
@@ -108,6 +122,20 @@ const postOffer = async () => {
           </div>
         </form>
         <div class="mt-8">
+          <div class="border-b border-gray-200 pb-5 sm:pb-0">
+            <div>
+              <nav class="-mb-px flex space-x-8 flex-wrap">
+                <NuxtLink
+                  v-for="tab in tabs"
+                  :key="tab.name"
+                  :to="tab.to"
+                  active-class="!border-emerald-500 !text-emerald-600"
+                  class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm"
+                  >{{ tab.name }}
+                </NuxtLink>
+              </nav>
+            </div>
+          </div>
           <NuxtPage />
         </div>
       </div>
