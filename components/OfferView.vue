@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRelay } from '~/composables/useRelay';
 import { ref } from 'vue';
+import { Sub } from 'nostr-tools';
 
 const props = defineProps({
   filter: { type: Object, default: {} },
@@ -11,18 +12,33 @@ const { filter, onlyShowActiveOffers } = toRefs(props);
 const relay = await useRelay();
 
 const events = ref<any[]>([]);
-
-const sub = relay.subscribeToEvents(
-  {
-    kinds: [NOSTR_OFFER_TYPE],
-    limit: 10,
-    ...filter.value,
+let sub: Sub | undefined = undefined;
+watch(
+  relay.isConnected,
+  (isConnected, wasConnected) => {
+    console.log({ isConnected, wasConnected });
+    if (isConnected && !wasConnected) {
+      if (sub) {
+        sub.unsub();
+      }
+      sub = relay.subscribeToEvents(
+        {
+          kinds: [NOSTR_OFFER_TYPE],
+          limit: 10,
+          since: events.value.length > 0 ? events.value[events.value.length].created_at : undefined,
+          ...filter.value,
+        },
+        async (event: any) => events.value.push(event)
+      );
+    }
   },
-  async (event: any) => events.value.push(event)
+  { immediate: true }
 );
+
 onBeforeUnmount(() => {
-  console.log('unsub');
-  sub.unsub();
+  if (sub) {
+    sub.unsub();
+  }
 });
 
 const sortedEvents = computed(() =>
