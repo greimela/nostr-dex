@@ -1,6 +1,10 @@
 # nostr-dex
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+An experimental trustless decentralized exchange using the
+[nostr protocol](https://github.com/nostr-protocol/nostr)
+and [Chia offers](https://chialisp.com/offers/).
+
+![nostr-dex screenshot](.github/screenshot.png)
 
 ## Setup
 
