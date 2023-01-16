@@ -6,7 +6,9 @@ import {
   decompress_object_with_puzzles,
   NFT_OWNERSHIP_LAYER_MOD,
   NFT_STATE_LAYER_MOD,
+  SETTLEMENT_PAYMENTS_MOD,
   SETTLEMENT_PAYMENTS_MOD_HASH,
+  SETTLEMENT_PAYMENTS_OLD_MOD,
   SETTLEMENT_PAYMENTS_OLD_MOD_HASH,
 } from '~/chia/puzzle-compression';
 import { bigint_from_bytes, Bytes, int_from_bytes, SExp } from 'clvm';
@@ -135,13 +137,26 @@ export class Offer {
           }
         }
 
-        const matching_spend_additions = additions.filter((a) => {
-          // console.log(a.amount, offered_amounts);
-          return offered_amounts.includes(a.amount);
-        });
-        // console.log({ matching_spend_additions });
+        let matching_spend_additions = additions.filter((a) => offered_amounts.includes(a.amount));
+
         if (matching_spend_additions.length === expected_num_matches) {
           coins_for_this_spend = matching_spend_additions;
+        } else {
+          if (matching_spend_additions.length < expected_num_matches) {
+            matching_spend_additions = additions;
+          }
+          matching_spend_additions = matching_spend_additions.filter((a) => {
+            return [
+              util.sexp.sha256tree(util.sexp.CATPuzzle(assetId, SETTLEMENT_PAYMENTS_MOD)),
+              util.sexp.sha256tree(util.sexp.CATPuzzle(assetId, SETTLEMENT_PAYMENTS_OLD_MOD)),
+            ].includes(a.puzzleHash);
+          });
+
+          if (matching_spend_additions.length === expected_num_matches) {
+            coins_for_this_spend = matching_spend_additions;
+          } else {
+            throw new Error('Could not properly guess offered coins from parent spend');
+          }
         }
       } else {
         coins_for_this_spend = additions.filter((addition) =>
