@@ -38,6 +38,7 @@ const ZDICT = [
     NFT_OWNERSHIP_TRANSFER_PROGRAM_ONE_WAY_CLAIM_WITH_ROYALTIES_MOD.toString(),
   CAT_V2_MOD.toString(),
   SETTLEMENT_PAYMENTS_MOD.toString(),
+  ''
 ].map((t) => Buffer.from(t, 'hex'));
 
 export function decompress_object_with_puzzles(compressed_object_blob: Buffer): ArrayBufferLike {
