@@ -4,7 +4,7 @@ import NodeGlobalsPolyfillPlugin from '@esbuild-plugins/node-globals-polyfill';
 
 export default defineNuxtConfig({
   ssr: false,
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/devtools', '@nuxtjs/tailwindcss'],
   app: {
     head: {
       title: 'nostr-dex | Trustless Chia DEX on Nostr',
