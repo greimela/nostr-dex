@@ -10,7 +10,7 @@ export const useRelay = async () => {
   const isConnected = useState<boolean>('isRelayConnected', () => false);
 
   if (!relay.value) {
-    relay.value = relayInit('wss://nostr.8e23.net');
+    relay.value = relayInit('wss://relay.nostrss.re');
     await relay.value.connect();
 
     relay.value.on('connect', () => {
