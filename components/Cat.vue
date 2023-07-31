@@ -11,6 +11,6 @@ const { data } = useFetch(`https://mainnet-api.taildatabase.com/tail/${cat.tailH
 <template>
   <NuxtLink target="_blank" :to="`https://www.taildatabase.com/tail/${cat.tailHash}`" class="inline-flex gap-1">
     <img class="h-6 w-6" :src="`https://icons.dexie.space/${cat.tailHash}.webp`" />{{ util.formatToken(amount) }}
-    {{ data?.name || "UNKNOWN" }}
+    {{ data?.code || "UNKNOWN" }}
   </NuxtLink>
 </template>
